@@ -1,7 +1,0 @@
-CompileFlags:
-  Add:
-    - "-I/home/joaopedrorodrigues/42/ft_irc/inc"
-    - "-Wall"
-    - "-Wextra"
-    - "-Werror"
-    - "-std=c++98"
