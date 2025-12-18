@@ -225,8 +225,7 @@ void Server::_handleClientData(int client_fd) {
 }
 
 void Server::_setNonBlocking(int fd) {
-	int flags = fcntl(fd, F_GETFL, 0);
-	fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+	fcntl(fd, F_SETFL, O_NONBLOCK);
 }
 
 //
