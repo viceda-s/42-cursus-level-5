@@ -4,6 +4,14 @@
 #include <string>
 #include <ctime>
 
+/**
+ * @class Client
+ * @brief Represents a connected HTTP client
+ *
+ * Manages client connection state, incoming request buffer,
+ * and tracks request parsing progress for proper HTTP/1.1
+ * request handling including body content.
+ */
 class Client {
 private:
 	int _fd;

@@ -1,4 +1,4 @@
-#include "Response.hpp"
+#include "HttpResponse.hpp"
 #include <sstream>
 
 Response::Response() : _status_code(200) {

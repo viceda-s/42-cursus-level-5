@@ -41,5 +41,5 @@ private:
 	std::string _trim(const std::string& str) const;
 };
 
-#endif // REQUEST_HPP
+#endif // HTTPREQUEST_HPP
 
