@@ -31,46 +31,7 @@ std::string FileTransfer::_getLocalIP() {
 	return "127.0.0.1";
 }
 
-void FileTransfer::_displayProgressBar(int percentage, const std::string& action) {
-	const char* bars[] = {
-		"⣿⣀⣀⣀⣀⣀⣀⣀⣀⣀",  // 10%
-		"⣿⣿⣀⣀⣀⣀⣀⣀⣀⣀",  // 20%
-		"⣿⣿⣿⣀⣀⣀⣀⣀⣀⣀",  // 30%
-		"⣿⣿⣿⣿⣀⣀⣀⣀⣀⣀",  // 40%
-		"⣿⣿⣿⣿⣿⣀⣀⣀⣀⣀",  // 50%
-		"⣿⣿⣿⣿⣿⣿⣀⣀⣀⣀",  // 60%
-		"⣿⣿⣿⣿⣿⣿⣿⣀⣀⣀",  // 70%
-		"⣿⣿⣿⣿⣿⣿⣿⣿⣀⣀",  // 80%
-		"⣿⣿⣿⣿⣿⣿⣿⣿⣿⣀",  // 90%
-		"⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿"   // 100%
-	};
 
-	int barIndex = percentage / 10;
-	if (barIndex < 0) barIndex = 0;
-	if (barIndex > 9) barIndex = 9;
-
-	std::string filename = _filename;
-	if (!filename.empty()) {
-		size_t lastSlash = filename.find_last_of("/\\");
-		if (lastSlash != std::string::npos && lastSlash +1 < filename.length()) {
-			filename = filename.substr(lastSlash + 1);
-		}
-	}
-
-	// Truncate if too long
-	if (filename.length() > 20) {
-		filename = filename.substr(0, 17) + "...";
-	}
-
-	if (filename.empty()) filename = "(file)";
-
-	std::cout << "\r"
-				<< std::setw(12) <<std::left << action
-				<< std::setw(20) <<std::left << _filename.substr(0, 20)
-				<< "" << bars[barIndex]
-				<< "" << percentage << "%"
-				<< std::flush;
-}
 
 bool FileTransfer::setupListenSocket(int& port) {
 	_listen_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -106,13 +67,7 @@ bool FileTransfer::setupListenSocket(int& port) {
 	port = ntohs(addr.sin_port);
 
 	// Set non-blocking
-	int flags = fcntl(_listen_fd, F_GETFL, 0);
-	if (flags < 0) {
-		close(_listen_fd);
-		_listen_fd = -1;
-		return false;
-	}
-	if (fcntl(_listen_fd, F_SETFL, flags | O_NONBLOCK) < 0) {
+	if (fcntl(_listen_fd, F_SETFL, O_NONBLOCK) < 0) {
 		close(_listen_fd);
 		_listen_fd = -1;
 		return false;
@@ -159,10 +114,7 @@ bool FileTransfer::acceptConnection() {
 	}
 
 	// Set transfer socket to non-blocking
-	int flags = fcntl(_transfer_fd, F_GETFL, 0);
-	if (flags >= 0) {
-		fcntl(_transfer_fd, F_SETFL, flags | O_NONBLOCK);
-	}
+	fcntl(_transfer_fd, F_SETFL, O_NONBLOCK);
 
 	// Close listening socket
 	close(_listen_fd);
@@ -188,7 +140,6 @@ bool FileTransfer::sendFileData() {
 		ssize_t sent = send(_transfer_fd, buffer, bytes_read, 0);
 		if (sent > 0) {
 			_bytes_sent += static_cast<unsigned long>(sent);
-			displayTransferProgress();
 			
 			// Check if transfer is complete
 			if (_file.eof() && _bytes_sent >= _filesize) {
@@ -215,7 +166,6 @@ bool FileTransfer::sendFileData() {
 
 	// EOF reached
 	if (_file.eof()) {
-		displayTransferProgress();
 		if (_transfer_fd >= 0) {
 			shutdown(_transfer_fd, SHUT_WR);
 			close(_transfer_fd);
@@ -228,22 +178,6 @@ bool FileTransfer::sendFileData() {
 		return false;
 	}
 	return true;
-}
-
-void FileTransfer::displayTransferProgress() {
-	if (_filesize == 0) return;
-
-	double ratio = (double)_bytes_sent / (double)_filesize;
-	int percentage = static_cast<int>(ratio * 100);
-
-	if (percentage < 0) percentage = 0;
-	if (percentage > 100) percentage = 100;
-	
-	_displayProgressBar(percentage, "Sending");
-
-	if (percentage >= 100) {
-		std::cout << " - Complete!" << std::endl;
-	}
 }
 
 bool FileTransfer::isComplete() const {
