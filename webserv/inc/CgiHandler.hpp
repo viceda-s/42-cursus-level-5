@@ -2,7 +2,6 @@
 #define CGIHANDLER_HPP
 
 #include <string>
-#include <map>
 
 class Request;
 class Response;

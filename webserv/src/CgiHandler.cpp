@@ -8,6 +8,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <sstream>
+#include <vector>
 
 CgiHandler::CgiHandler(const std::string& cgi_path, const std::string& script_path,
                        const Request& request, const LocationConfig* location)
