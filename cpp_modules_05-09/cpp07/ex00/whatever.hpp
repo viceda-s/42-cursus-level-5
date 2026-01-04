@@ -5,6 +5,9 @@
 #ifndef WHATEVER_HPP
 #define WHATEVER_HPP
 
+#include <iostream>
+#include <string>
+
 // Exercise 00: Start with a few functions
 // Function templates: swap, min, max
 

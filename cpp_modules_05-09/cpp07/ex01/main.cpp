@@ -1,76 +1,80 @@
-#ifndef ARRAY_HPP
-#define ARRAY_HPP
+//
+// Created by viceda-s on 03/01/2026.
+//
 
-#include <stdexcept>
+#include "iter.hpp"
+
+// Test functions
+template <typename T>
+void printElement(T &element)
+{
+    std::cout << element << " ";
+}
 
 template <typename T>
-class Array
+void incrementElement(T &element)
 {
-private:
-    T *_data;
-    unsigned int _size;
+    element++;
+}
 
-public:
-    // Default constructor: empty array
-    Array() : _data(NULL), _size(0)
-    {
-    }
+void toUppercase(char &c)
+{
+    if (c >= 'a' && c <= 'z')
+        c = c - 32;
+}
 
-    // Constructor with size parameter
-    Array(unsigned int n) : _size(n)
-    {
-        _data = new T[n]();
-    }
+int main(void)
+{
+    // Test with int array
+    std::cout << "=== Testing with int array ===" << std::endl;
+    int intArray[] = {1, 2, 3, 4, 5};
+    int intLength = 5;
 
-    // Copy constructor
-    Array(const Array &other) : _size(other._size)
-    {
-        _data = new T[_size];
-        for (unsigned int i = 0; i < _size; i++)
-            _data[i] = other._data[i];
-    }
+    std::cout << "Original: ";
+    iter(intArray, intLength, printElement<int>);
+    std::cout << std::endl;
 
-    // Assignment operator
-    Array &operator=(const Array &other)
-    {
-        if (this != &other)
-        {
-            delete[] _data;
-            _size = other._size;
-            _data = new T[_size];
-            for (unsigned int i = 0; i < _size; i++)
-                _data[i] = other._data[i];
-        }
-        return *this;
-    }
+    iter(intArray, intLength, incrementElement<int>);
+    std::cout << "After increment: ";
+    iter(intArray, intLength, printElement<int>);
+    std::cout << std::endl << std::endl;
 
-    // Destructor
-    ~Array()
-    {
-        delete[] _data;
-    }
+    // Test with double array
+    std::cout << "=== Testing with double array ===" << std::endl;
+    double doubleArray[] = {1.1, 2.2, 3.3, 4.4, 5.5};
+    int doubleLength = 5;
 
-    // Subscript operator - non-const version
-    T &operator[](unsigned int index)
-    {
-        if (index >= _size)
-            throw std::out_of_range("Index out of bounds");
-        return _data[index];
-    }
+    std::cout << "Original: ";
+    iter(doubleArray, doubleLength, printElement<double>);
+    std::cout << std::endl;
 
-    // Subscript operator - const version
-    const T &operator[](unsigned int index) const
-    {
-        if (index >= _size)
-            throw std::out_of_range("Index out of bounds");
-        return _data[index];
-    }
+    iter(doubleArray, doubleLength, incrementElement<double>);
+    std::cout << "After increment: ";
+    iter(doubleArray, doubleLength, printElement<double>);
+    std::cout << std::endl << std::endl;
 
-    // Size member function
-    unsigned int size(void) const
-    {
-        return _size;
-    }
-};
+    // Test with char array
+    std::cout << "=== Testing with char array ===" << std::endl;
+    char charArray[] = {'h', 'e', 'l', 'l', 'o'};
+    int charLength = 5;
 
-#endif
+    std::cout << "Original: ";
+    iter(charArray, charLength, printElement<char>);
+    std::cout << std::endl;
+
+    iter(charArray, charLength, toUppercase);
+    std::cout << "After toUppercase: ";
+    iter(charArray, charLength, printElement<char>);
+    std::cout << std::endl << std::endl;
+
+    // Test with string array
+    std::cout << "=== Testing with string array ===" << std::endl;
+    std::string stringArray[] = {"Hello", "World", "42"};
+    int stringLength = 3;
+
+    std::cout << "Strings: ";
+    iter(stringArray, stringLength, printElement<std::string>);
+    std::cout << std::endl;
+
+    return 0;
+}

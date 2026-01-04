@@ -5,6 +5,9 @@
 #ifndef ITER_HPP
 #define ITER_HPP
 
+#include <iostream>
+#include <string>
+
 // Exercise 01: Iter
 // Function template that applies a function to every element of an array
 
