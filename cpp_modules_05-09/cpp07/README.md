@@ -302,7 +302,8 @@ valgrind --leak-check=full ./Array
 
 ## Author
 
-**viceda-s** - 42 Network Student
+**viceda-s**  
+*42 Luxembourg*
 
 ---
 
