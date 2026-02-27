@@ -5,24 +5,24 @@
 std::string HttpResponse::loadErrorPage(const std::string& error_code) {
     std::string file_path = "www/errors/" + error_code + ".html";
     std::ifstream file(file_path.c_str());
-    
+
     if (file.is_open()) {
         std::stringstream buffer;
         buffer << file.rdbuf();
         file.close();
         return buffer.str();
     }
-    
+
     // Fallback to generic error response if file not found
     return "<html><body><h1>" + error_code + " Error</h1></body></html>";
 }
 
-HttpResponse::HttpResponse() 
+HttpResponse::HttpResponse()
     : status_code(200), status_message("OK"), headers_sent(false) {
     setHeader("Server", "WebServ/1.0");
 }
 
-HttpResponse::HttpResponse(int code) 
+HttpResponse::HttpResponse(int code)
     : status_code(code), headers_sent(false) {
     status_message = getStatusMessage(code);
     setHeader("Server", "WebServ/1.0");
@@ -71,22 +71,22 @@ void HttpResponse::setContentType(const std::string& mime_type) {
 
 std::string HttpResponse::build() {
     std::ostringstream response;
-    
+
     // Status line
     response << "HTTP/1.1 " << status_code << " " << status_message << "\r\n";
-    
+
     // Headers
     for (std::map<std::string, std::string>::const_iterator it = headers.begin();
          it != headers.end(); ++it) {
         response << it->first << ": " << it->second << "\r\n";
     }
-    
+
     // Empty line separating headers from body
     response << "\r\n";
-    
+
     // Body
     response << body;
-    
+
     return response.str();
 }
 
@@ -115,7 +115,7 @@ HttpResponse HttpResponse::noContent() {
 HttpResponse HttpResponse::redirect(const std::string& location, int code) {
     HttpResponse response(code);
     response.setHeader("Location", location);
-    std::string body = "<html><body><h1>Redirect</h1><p>Redirecting to <a href=\"" + 
+    std::string body = "<html><body><h1>Redirect</h1><p>Redirecting to <a href=\"" +
                        location + "\">" + location + "</a></p></body></html>";
     response.setBody(body);
     response.setContentType("text/html");
@@ -175,3 +175,4 @@ HttpResponse HttpResponse::payloadTooLarge(const std::string& message) {
     response.setContentType("text/html");
     return response;
 }
+

@@ -1,4 +1,4 @@
-#include "Server.hpp"
+#include "../../includes/Server.hpp"
 #include <iostream>
 #include <cstdlib>
 #include <csignal>
@@ -34,3 +34,4 @@ int main(int argc, char** argv) {
 
 	return 0;
 }
+
