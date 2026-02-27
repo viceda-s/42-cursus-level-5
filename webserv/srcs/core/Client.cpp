@@ -32,3 +32,4 @@ void Client::updateActivity() {
 void Client::resetRequest() {
 	_request = HttpRequest();
 }
+

@@ -9,9 +9,9 @@
 
 #define PATH_SEPARATOR '/'
 
-StaticFileHandler::StaticFileHandler(const std::string& root, bool dir_listing, 
+StaticFileHandler::StaticFileHandler(const std::string& root, bool dir_listing,
                                      const std::string& def_file)
-    : root_directory(root), directory_listing_enabled(dir_listing), 
+    : root_directory(root), directory_listing_enabled(dir_listing),
       default_file(def_file) {
 }
 
@@ -19,10 +19,10 @@ std::string StaticFileHandler::getMimeType(const std::string& path) const {
     size_t dot_pos = path.find_last_of('.');
     if (dot_pos == std::string::npos)
         return "application/octet-stream";
-    
+
     std::string ext = path.substr(dot_pos);
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
-    
+
     if (ext == ".html" || ext == ".htm") return "text/html";
     if (ext == ".css") return "text/css";
     if (ext == ".js") return "application/javascript";
@@ -41,7 +41,7 @@ std::string StaticFileHandler::getMimeType(const std::string& path) const {
     if (ext == ".woff") return "font/woff";
     if (ext == ".woff2") return "font/woff2";
     if (ext == ".ttf") return "font/ttf";
-    
+
     return "application/octet-stream";
 }
 
@@ -63,35 +63,35 @@ std::string StaticFileHandler::readFile(const std::string& path, bool& success) 
         success = false;
         return "";
     }
-    
+
     std::ostringstream oss;
     oss << file.rdbuf();
     success = true;
     return oss.str();
 }
 
-std::string StaticFileHandler::combinePaths(const std::string& base, 
+std::string StaticFileHandler::combinePaths(const std::string& base,
                                            const std::string& relative) const {
     std::string result = base;
-    
+
     // Ensure base ends with separator
-    if (!result.empty() && result[result.length() - 1] != '/' && 
+    if (!result.empty() && result[result.length() - 1] != '/' &&
         result[result.length() - 1] != '\\') {
         result += PATH_SEPARATOR;
     }
-    
+
     // Remove leading slash from relative path
     std::string rel = relative;
     if (!rel.empty() && (rel[0] == '/' || rel[0] == '\\')) {
         rel = rel.substr(1);
     }
-    
+
     // Replace forward slashes with platform separator
     for (size_t i = 0; i < rel.length(); ++i) {
         if (rel[i] == '/' || rel[i] == '\\')
             rel[i] = PATH_SEPARATOR;
     }
-    
+
     return result + rel;
 }
 
@@ -99,12 +99,12 @@ bool StaticFileHandler::isPathSafe(const std::string& path) const {
     // Prevent directory traversal attacks
     if (path.find("..") != std::string::npos)
         return false;
-    
+
     // Additional security checks could be added here
     return true;
 }
 
-std::string StaticFileHandler::generateDirectoryListing(const std::string& dir_path, 
+std::string StaticFileHandler::generateDirectoryListing(const std::string& dir_path,
                                                         const std::string& uri) const {
     std::ostringstream html;
     html << "<html><head><title>Index of " << uri << "</title>";
@@ -119,12 +119,12 @@ std::string StaticFileHandler::generateDirectoryListing(const std::string& dir_p
          << "</style></head><body>";
     html << "<h1>Index of " << uri << "</h1>";
     html << "<table><tr><th>Name</th><th>Type</th></tr>";
-    
+
     // Add parent directory link
     if (uri != "/") {
         html << "<tr><td><a href=\"..\">..</a></td><td>Directory</td></tr>";
     }
-    
+
     DIR* dir = opendir(dir_path.c_str());
     if (dir) {
         struct dirent* entry;
@@ -135,50 +135,50 @@ std::string StaticFileHandler::generateDirectoryListing(const std::string& dir_p
                 bool is_dir = isDirectory(full_path);
                 std::string link = name;
                 if (is_dir) link += "/";
-                
-                html << "<tr><td><a href=\"" << link << "\">" << name 
-                     << (is_dir ? "/" : "") << "</a></td><td>" 
+
+                html << "<tr><td><a href=\"" << link << "\">" << name
+                     << (is_dir ? "/" : "") << "</a></td><td>"
                      << (is_dir ? "Directory" : "File") << "</td></tr>";
             }
         }
         closedir(dir);
     }
-    
+
     html << "</table></body></html>";
     return html.str();
 }
 
 HttpResponse StaticFileHandler::handleRequest(const HttpRequest& request) {
     HttpMethod method = request.getMethod();
-    
+
     std::string uri = request.getUri();
-    
+
     // Security check
     if (!isPathSafe(uri)) {
         return HttpResponse::badRequest("Invalid path");
     }
-    
+
     // Build full file path
     std::string file_path = combinePaths(root_directory, uri);
-    
+
     // Handle DELETE method
     if (method == DELETE) {
         if (!fileExists(file_path)) {
             return HttpResponse::notFound("The requested resource was not found");
         }
-        
+
         // Prevent deletion of index files
         if (uri == "/" || uri.empty()) {
             return HttpResponse::methodNotAllowed("Cannot delete index file");
         }
-        
+
         // Check if it's a default file (index.html, etc.)
         size_t last_slash = file_path.find_last_of('/');
         std::string filename = (last_slash != std::string::npos) ? file_path.substr(last_slash + 1) : file_path;
         if (filename == default_file || filename == "index.html" || filename == "index.htm") {
             return HttpResponse::methodNotAllowed("Cannot delete index files");
         }
-        
+
         if (remove(file_path.c_str()) == 0) {
             return HttpResponse::ok("<html><body><h1>200 OK</h1><p>File deleted successfully</p></body></html>", "text/html");
         } else {
@@ -186,17 +186,17 @@ HttpResponse StaticFileHandler::handleRequest(const HttpRequest& request) {
             return HttpResponse::methodNotAllowed("Permission denied: Cannot delete file");
         }
     }
-    
+
     // Only handle GET and HEAD requests for static files
     if (method != GET && method != HEAD) {
         return HttpResponse::methodNotAllowed("Only GET and HEAD are allowed for static files");
     }
-    
+
     // Check if file/directory exists
     if (!fileExists(file_path)) {
         return HttpResponse::notFound("The requested resource was not found");
     }
-    
+
     // If it's a directory
     if (isDirectory(file_path)) {
         // Try to serve default file
@@ -209,7 +209,7 @@ HttpResponse StaticFileHandler::handleRequest(const HttpRequest& request) {
                 return response;
             }
         }
-        
+
         // If no default file, check if directory listing is enabled
         if (directory_listing_enabled) {
             std::string listing = generateDirectoryListing(file_path, uri);
@@ -218,13 +218,14 @@ HttpResponse StaticFileHandler::handleRequest(const HttpRequest& request) {
             return HttpResponse::notFound("Directory listing is disabled");
         }
     }
-    
+
     // It's a file - read and serve it
     bool success;
     std::string content = readFile(file_path, success);
     if (!success) {
         return HttpResponse::internalServerError("Failed to read file");
     }
-    
+
     return HttpResponse::ok(content, getMimeType(file_path));
 }
+

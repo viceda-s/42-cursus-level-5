@@ -17,8 +17,8 @@ static std::string toLower(const std::string& str) {
     return lower;
 }
 
-HttpRequest::HttpRequest() 
-    : method(UNKNOWN), state(REQUEST_LINE), bytes_parsed(0), 
+HttpRequest::HttpRequest()
+    : method(UNKNOWN), state(REQUEST_LINE), bytes_parsed(0),
       content_length(0), error_code(0) {
 }
 
@@ -60,30 +60,30 @@ std::string HttpRequest::getMethodString() const {
 void HttpRequest::parseRequestLine(const std::string& line) {
     std::istringstream iss(line);
     std::string method_str;
-    
+
     iss >> method_str >> uri >> http_version;
-    
+
     method = stringToMethod(method_str);
-    
+
     if (method == UNKNOWN) {
         error_code = 405; // Method Not Allowed
         state = ERROR;
         return;
     }
-    
+
     if (uri.empty() || http_version.empty()) {
         error_code = 400; // Bad Request
         state = ERROR;
         return;
     }
-    
+
     // Check HTTP version
     if (http_version != "HTTP/1.1" && http_version != "HTTP/1.0") {
         error_code = 505; // HTTP Version Not Supported
         state = ERROR;
         return;
     }
-    
+
     parseQueryString();
     state = HEADERS;
 }
@@ -103,10 +103,10 @@ void HttpRequest::parseHeader(const std::string& line) {
         state = ERROR;
         return;
     }
-    
+
     std::string key = trim(line.substr(0, pos));
     std::string value = trim(line.substr(pos + 1));
-    
+
     // Convert header names to lowercase for case-insensitive lookup
     headers[toLower(key)] = value;
 }
@@ -127,9 +127,9 @@ bool HttpRequest::isChunked() const {
 bool HttpRequest::parse(const char* data, size_t len) {
     if (state == COMPLETE || state == ERROR)
         return state == COMPLETE;
-    
+
     raw_data.append(data, len);
-    
+
     while (state != COMPLETE && state != ERROR) {
         if (state == REQUEST_LINE || state == HEADERS) {
             size_t line_end = raw_data.find("\r\n", bytes_parsed);
@@ -141,10 +141,9 @@ bool HttpRequest::parse(const char* data, size_t len) {
                 }
                 return false; // Need more data
             }
-            
+
             std::string line = raw_data.substr(bytes_parsed, line_end - bytes_parsed);
             bytes_parsed = line_end + 2; // Skip \r\n
-            
             if (state == REQUEST_LINE) {
                 parseRequestLine(line);
             } else if (state == HEADERS) {
@@ -155,7 +154,7 @@ bool HttpRequest::parse(const char* data, size_t len) {
                         std::istringstream iss(content_len_str);
                         iss >> content_length;
                     }
-                    
+
                     // Extract boundary for multipart/form-data
                     std::string content_type = getHeader("Content-Type");
                     if (content_type.find("multipart/form-data") != std::string::npos) {
@@ -163,13 +162,13 @@ bool HttpRequest::parse(const char* data, size_t len) {
                         if (boundary_pos != std::string::npos) {
                             boundary = content_type.substr(boundary_pos + 9);
                             // Remove quotes if present (C++98 compatible)
-                            if (!boundary.empty() && boundary[0] == '"' && 
+                            if (!boundary.empty() && boundary[0] == '"' &&
                                 boundary[boundary.length() - 1] == '"') {
                                 boundary = boundary.substr(1, boundary.length() - 2);
                             }
                         }
                     }
-                    
+
                     if (content_length > 0 || isChunked()) {
                         state = BODY;
                     } else {
@@ -181,7 +180,7 @@ bool HttpRequest::parse(const char* data, size_t len) {
             }
         } else if (state == BODY) {
             if (isChunked()) {
-                // Simplified chunked handling - in real implementation, 
+                // Simplified chunked handling - in real implementation,
                 // you'd need to properly parse chunk sizes
                 error_code = 501; // Not Implemented for chunked
                 state = ERROR;
@@ -200,6 +199,7 @@ bool HttpRequest::parse(const char* data, size_t len) {
             }
         }
     }
-    
+
     return state == COMPLETE;
 }
+
