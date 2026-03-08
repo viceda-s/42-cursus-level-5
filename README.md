@@ -1,14 +1,14 @@
-## Milestone 5 – In Progress 🟡
+# Milestone 5 – Completed 🟢
 
-Milestone 5 focuses on advanced system programming, networking, containerization, and deeper C++ concepts. At this stage, **ft_irc** and **CPP Modules 05–09** has been successfully completed with bonus, while **Inception** and **webserv** are currently **work in progress**.
+Welcome to my repository showcasing my progress in **Milestone 5** at 42 School. Below you'll find an overview of each project, the current status, and the challenges I'm facing as I continue to develop them.
 
 ## 🏅 My Scores
 
 | Project            | Status / Score | Notable Features |
 | :--                |:--------------:| :--              |
-| ft_irc             |   🌟 125/100   | IRC server, TCP sockets, multiplexing, real-time communication |
 | CPP Modules 05–09  |  ✅ 5/5  | Advanced C++ (exceptions, templates, STL, containers) |
-| Inception          |     🚧 WIP     | Docker, Docker Compose, containerized infrastructure |
+| ft_irc             |   🌟 125/100   | IRC server, TCP sockets, multiplexing, real-time communication |
+| Inception          |   🌟 125/100   | Docker, Docker Compose, containerised infrastructure |
 | webserv            |     🚧 WIP     | HTTP server, sockets, configuration parsing |
 
 ---
@@ -96,7 +96,7 @@ Build a complete containerized infrastructure using **Docker** and **Docker Comp
 
 ---
 
-## 🌐 webserv (w/ brunmart) – Work in Progress 🚧
+## 🌐 webserv (w/ brunmart, mdelima-m, rbaldin) – Work in Progress 🚧
 
 ### Objective
 Develop a **custom HTTP server** in C++, compliant with the HTTP/1.1 specification, capable of handling multiple clients and requests concurrently.
@@ -116,10 +116,9 @@ Develop a **custom HTTP server** in C++, compliant with the HTTP/1.1 specificati
 
 ---
 
-## 🏆 Milestone 5 Progress Summary
+## 🏆 Personal Achievements
 
-- **Major Achievement:** Completed **ft_irc** with bonus (125/100), demonstrating strong networking and system programming skills
-- **Ongoing Work:** Actively developing **CPP Modules 05–09** and **Inception**
+- **Major Achievement:** Completed **ft_irc** and **Inception** with bonus (125/100), demonstrating strong networking, system programming and containerisation skills
 - **Technical Growth:** Expanding expertise in advanced C++, containerization, and infrastructure management
 - **Next Steps:** Complete remaining Milestone 5 projects and continue refining code quality and system design
 
